@@ -110,6 +110,16 @@ class Http
      * @param array $header
      * @return mixed
      * @throws Exception
+     
+       $url = 'HTTP://xxxx/xxxx/upload';
+       
+        $data['file'] = curl_file_create(
+            $_FILES['tmp_name'],
+            $_FILES['type'],
+            '1452357944685add4827e45.png'
+        );
+        $resultJson = self::postWithFile($url, $data);
+     
      */
     public function postWithFile($url, $data = null, $header = [])
     {
@@ -124,7 +134,7 @@ class Http
         }
 
         if (defined('CURLOPT_SAFE_UPLOAD')) {
-            //5.6以后必须指定
+            //5.6以后必须指定，7.0不支持
             curl_setopt($ch, CURLOPT_SAFE_UPLOAD, false);
         }
         curl_setopt($ch, CURLOPT_POST, 1); //启用时会发送一个常规的POST请求，类型为：application/x-www-form-urlencoded，就像表单提交的一样。
@@ -147,6 +157,54 @@ class Http
         return $output;
     }
 
+/*
+* 生成curl需要参数
+
+        $url ='xxxx/xxx/xxx/upload';
+        $ch_init = curl_init($url);
+
+        $ch = self::buildCurlRequest(
+            $ch_init,
+            uniqid(),
+            ['token' => $tokenInfo['token']],
+            ['files' => file_get_contents('http://xxxxxxx/1452357944685add4827e45.png')],
+            'xxxxxxx.png'
+        );
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $ret = curl_exec($ch);
+
+*/
+    public function buildCurlRequest($ch, $boundary, $fields, $files,$filesName) {
+        $delimiter = '-------------' . $boundary;
+        $data = '';
+
+        foreach ($fields as $name => $content) {
+            $data .= "--" . $delimiter . "\r\n"
+                . 'Content-Disposition: form-data; name="' . $name . "\"\r\n\r\n"
+                . $content . "\r\n";
+        }
+
+        foreach ($files as $name => $content) {
+            $data .= "--" . $delimiter . "\r\n"
+                . 'Content-Disposition: form-data; name="' . $name . '"; filename="' . $filesName . '"' . "\r\n\r\n"
+                . $content . "\r\n";
+        }
+
+        $data .= "--" . $delimiter . "--\r\n";
+
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: multipart/form-data; boundary=' . $delimiter,
+                'Content-Length: ' . strlen($data)
+            ],
+            CURLOPT_POSTFIELDS => $data
+        ]);
+        return $ch;
+    }
+    
     /**
      * get 请求
      * @param $url string 请求地址
