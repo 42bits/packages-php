@@ -1,0 +1,41 @@
+package endpoints
+
+import (
+    "crypto/hmac"
+    "encoding/hex"
+    "crypto/sha256"
+    "encoding/json"
+    "encoding/base64"
+    "strings"
+)
+
+type TestEndpoints struct{}
+
+func (this *TestEndpoints) Ping() (string, error) {
+
+    postData := make(map[string]string)
+    postData["a"] = "crm"//appid
+    postData["b"] = "company-sec"//bucket（有私有和公有两套）
+    postData["k"] = "7fc1195a1145a1105d3cb96449b9aae5.jpg"//上传文件名
+    postData["op"] = "thumb/fit/watermark/vso_1.png"//水印，只有图片可以添加，其他类型不能添加，否则用该token获取文件会出错
+
+    dataEncode,_ := json.Marshal(postData)
+    serializeData := this.UrlSafeBase64Encode(dataEncode)
+
+    h := hmac.New(sha256.New, []byte("lKycmKKuT81hDT0jnjhU5pTyCwOIizIkzRgd2JSa"))//appkey
+    h.Write([]byte(serializeData))
+    expectedMAC := h.Sum(nil)
+    hashData :=hex.EncodeToString(expectedMAC)
+
+    encryption := this.UrlSafeBase64Encode([]byte(hashData))
+
+    token := encryption+":"+serializeData
+    return token, nil
+}
+
+func(this *TestEndpoints) UrlSafeBase64Encode(dataEncode []byte) (string){
+    dataBase := base64.StdEncoding.EncodeToString(dataEncode)
+    dataStr := strings.Replace(dataBase,"+/","-_",-1)
+    dataS := strings.TrimRight(dataStr,"=")
+    return dataS
+}
