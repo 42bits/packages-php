@@ -523,8 +523,8 @@ js弹窗，alert();confirm();焦点，focus();
 
 /*
 mysql_fetch_row() 和mysql_fetch_array之间有什么区别
-mysql_fetch_row()从结果集中取一行数组做枚举，
-mysql_fetch_array()从结果集取一行做关联数组
+mysql_fetch_row()从结果集中取得一行作为数字数组，
+mysql_fetch_array()是mysql_fetch_row升级版，还有关联索引，用字段名作为键名
 */
 
 /*
