@@ -1,1 +1,8 @@
 
+go在1.5前如果不设置GOMAXPROCS是单核执行多个goruntine，通过内部算法逻辑上实现并行，其实还是串行。1.5后GOMAXPROCS默认为CPU核数数量，可以并发执行多个goruntine。
+
+并发就是：两个队列，同时依次去访问一个资源。而并行：两个队列，分别依次访问两个资源。 
+简单来说，并发，就像一个人（cpu）喂2个孩子（程序），轮换着每人喂一口，表面上两个孩子都在吃饭。并行，就是2个人喂2个孩子，两个孩子也同时在吃饭。
+
+多个goruntine和main主goruntine执行没有先后顺序，子goruntine可能被执行也可能不会被执行，如果主goruntine执行完就结束不会等待子goruntine。
+为了避免主goruntine执行完，而子goruntine没有执行完，可以通过channel来实现各个goruntine间的通信从而实现堵塞，子goruntine遇到堵塞不会影响主goruntine的执行。
