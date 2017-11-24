@@ -21,4 +21,4 @@ glide.yaml import下添加
 glide mirror set https://golang.org/x/crypto https://github.com/golang/crypto
 glide mirror set https://golang.org/x/net https://github.com/golang/net
 
-在进行 glide install 或 up 就可以
+在进行 glide install 或 up 就可以（cache-clear清缓存,up --quick 快速安装）
