@@ -5,3 +5,20 @@ vendor目录1.5实验加入，1.6默认启用，为了解决不同项目不同�
 
 包的查找路径
 当前包下的vendor目录，向上级目录查找，直到找到src下的vendor目录，在GOPATH下面查找依赖包，在GOROOT目录下查找
+
+出现
+ Error looking for golang.org/x/crypto/pbkdf2: Cannot detect VCS
+Failed to do initial checkout of config: Cannot detect VCS
+
+[WARN]  Unable to checkout golang.org/x/net/context
+[ERROR] Error looking for golang.org/x/net/context: Cannot detect VCS
+
+方法：
+glide.yaml import下添加
+- package: golang.org/x/crypto
+- package: golang.org/x/net
+命令
+glide mirror set https://golang.org/x/crypto https://github.com/golang/crypto
+glide mirror set https://golang.org/x/net https://github.com/golang/net
+
+在进行 glide install 或 up 就可以
